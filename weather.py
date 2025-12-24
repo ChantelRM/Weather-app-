@@ -1,12 +1,16 @@
 import requests
 import math
 
-
+# TODO:
+# - Add the get condition,weather key, descption key
+# - advice for weather conditions based on temp max and temp min in main key dict[nested] and the weather description key in weather dict in list
+# -add error handlin gfor if data is not found for temp
+# -change return for temp function, maybe have get temp min and temp max functions
 class Weather:
     def __init__(self,city,api_key):
         self.city = city
         self.api_key = api_key
-        self.data = 'None'
+        self.data = None
     #  key = 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
     # key 5c940fbc1f7fa426e6c24c05fd945af8
 
