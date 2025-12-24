@@ -28,6 +28,7 @@ class Weather:
             return response
         else :
             print(f'Error {response.status_code} - {response.text}')
+            
     def get_temp(self):
         '''
         Docstring for get_temp
