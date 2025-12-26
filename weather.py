@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 api_key= os.getenv('api_key')
+if not api_key:
+    raise ValueError("api key not found. check .env")
 
 # TODO:
     # - Add the get condition,weather key, descption key
@@ -15,7 +17,7 @@ api_key= os.getenv('api_key')
 class Weather:
     def __init__(self,city):
         self.city = city
-        self.api_key = '5c940fbc1f7fa426e6c24c05fd945af8'
+        self.api_key = api_key
         self.data = None
         # self.get_condition()
         # self.get_current_temp()
@@ -42,9 +44,6 @@ class Weather:
             response = requests.get(url) #converting to json allows us to access individual attributes
             response.raise_for_status()
             self.data =response.json()
-            # for key,value in self.data.items():
-            #     print(key,value)
-            # print(self.data)
             return True
         except requests.exceptions.RequestException as e:
             print(f'Error fetching data {e}')
@@ -84,36 +83,22 @@ class Weather:
         '''
         Based on the condition, this fuction returns basic advice to the user based on the weather condition
         '''
-        condition = self.get_condition().lower()
-
-        WEATHER_EMOJIS = {
-                        "clear sky": "☀️",
-                        "few clouds": "🌤️",
-                        "scattered clouds": "⛅",
-                        "partially cloudy": '\u2601',
-                        "broken clouds": "☁️",
-                        "shower rain": "🌦️",
-                        "rain": "🌧️",
-                        'shower': '\u2614',
-                        "thunderstorm": "⛈️",
-                        "snow": "❄️",
-                        "mist": "🌫️"
-                    }
+        condition = self.get_condition()
     
-        if 'sunny' or 'clear' in condition:
-            ...
-        elif 'shower':
-
-        elif 'rain':
-
-        elif 'thunder':
-
-        elif 'snow':
-
-        elif 'fog' or 'mist' :
-
-        elif 'scattered clouds' or 'partially cloud':
-    pass
+        if not condition:
+            return 'No data availible'
+        elif 'sun' in condition or 'clear' in condition:
+            return "Clear skies! ☀️"
+        elif 'shower' in condition or 'rain' in condition or 'thunder' in condition:
+            return "Uhm...you should take an umbrella! 🌧️"
+        elif 'snow' in condition:
+            return "Dress warm! ❄️"
+        elif 'fog' in condition or 'mist' in condition :
+            return "Visibilty is not great stay cautious while driving! 🌫️"
+        elif 'cloud' in condition:
+            return "Mmm... A bit cloudy... ☁️"
+        else:
+            return 'Mmm, seem slike a normal day'
 
 def main():
 
@@ -122,10 +107,11 @@ def main():
     weather = Weather(city)
     weather.fetch_data()
     print(f'Condition:  {weather.get_condition()}')
-    print(f'Current temperature: {weather.get_current_temp():.0f}°C')
-    print(f'Feels like: {weather.get_feels():.0f}°C')
-    print(f'Max. temperature: {weather.get_temp_max():.0f}°C')
-    print(f'Min. temperature: {weather.get_temp_min():.0f}°C')
+    print(f'Current temperature: {weather.get_current_temp()}°C')
+    print(f'Feels like: {weather.get_feels()}°C')
+    print(f'Max. temperature: {weather.get_temp_max()}°C')
+    print(f'Min. temperature: {weather.get_temp_min()}°C')
+    print(f'{weather.advice()}')
 
 if __name__=='__main__':
     main()
