@@ -3,32 +3,19 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-api_key= os.getenv('api_key')
+api_key= os.getenv('weather_api_key')
 if not api_key:
     raise ValueError("api key not found. check .env")
 
 # TODO:
-    # - Add the get condition,weather key, descption key
-    # - advice for weather conditions based on temp max and temp min in main key dict[nested] and the weather description key in weather dict in list
-    # -add error handlin gfor if data is not found for temp
-    # -change return for temp function, maybe have get temp min and temp max functions
-    # - Add wind speed, direction
+    # - advice for weather conditions based on temp max and temp min 
+
 
 class Weather:
     def __init__(self,city):
         self.city = city
         self.api_key = api_key
         self.data = None
-        # self.get_condition()
-        # self.get_current_temp()
-        # self.advice()
-        # self.get_feels()
-        # self.get_humidity()
-        # self.get_temp_max()
-        # self.get_temp_min()
-
-    #  key = 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
-    # key 5c940fbc1f7fa426e6c24c05fd945af8
 
     def fetch_data(self):
         '''
@@ -44,6 +31,7 @@ class Weather:
             response = requests.get(url) #converting to json allows us to access individual attributes
             response.raise_for_status()
             self.data =response.json()
+            # print(self.data)
             return True
         except requests.exceptions.RequestException as e:
             print(f'Error fetching data {e}')
@@ -78,6 +66,33 @@ class Weather:
         if not self.data:
             return None
         return self.data['weather'][0]['description']
+    
+    def get_wind_direction(self):
+        degree = self.data['wind']['deg']
+        if degree == None:
+            return None
+        
+        if 337.5 <= degree <= 22.5:
+            return 'N'
+        elif 22.5 <= degree <= 67.5:
+            return 'NE'
+        elif 67.5 <= degree <= 112.5:
+            return 'E'
+        elif 112.5 <= degree <= 157.5:
+            return 'SE'
+        elif 157.5 <= degree <= 202.5:
+            return 'S'
+        elif 202.5 <= degree <= 247.5:
+            return 'SW'
+        elif 247.5 <= degree <= 292.5:
+            return 'W'
+        elif 292.5 <= degree <= 337.5:
+            return 'NW'   
+    
+    def get_wind_speed(self):
+        if not self.data:
+            return None
+        return self.data['wind']['speed']
 
     def advice(self):
         '''
@@ -101,17 +116,17 @@ class Weather:
             return 'Mmm, seem slike a normal day'
 
 def main():
-
-    city = input('City:     ')
-    # weather = Weather(city,api_key = '5c940fbc1f7fa426e6c24c05fd945af8')
+    city = input('Enter city -> ')
     weather = Weather(city)
     weather.fetch_data()
     print(f'Condition:  {weather.get_condition()}')
-    print(f'Current temperature: {weather.get_current_temp()}°C')
-    print(f'Feels like: {weather.get_feels()}°C')
-    print(f'Max. temperature: {weather.get_temp_max()}°C')
-    print(f'Min. temperature: {weather.get_temp_min()}°C')
-    print(f'{weather.advice()}')
+    print(f'Current temperature: {weather.get_current_temp():.0f}°C')
+    print(f'Feels like: {weather.get_feels():.0f}°C')
+    print(f'Max. temperature: {weather.get_temp_max():.0f}°C')
+    print(f'Min. temperature: {weather.get_temp_min():.0f}°C')
+    print(f'Speed: {weather.get_wind_speed()}km/h, Direction: {weather.get_wind_direction()}')
+    print(f'Humidity: {weather.get_humidity()}%')
+    print(f'Advice: {weather.advice()}')
 
 if __name__=='__main__':
     main()
